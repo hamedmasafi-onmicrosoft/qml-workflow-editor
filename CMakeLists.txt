@@ -12,7 +12,12 @@ qt_add_executable(appWorkFlowEditor
     main.cpp
     block.h block.cpp
     workfloweditorarea.h workfloweditorarea.cpp
-    relation.h relation.cpp
+
+    abstractrelation.h abstractrelation.cpp
+
+    directrelation.h directrelation.cpp
+    curvedrelation.h curvedrelation.cpp
+
     relationhandle.h relationhandle.cpp
 
     commands/addblockcommand.h commands/addblockcommand.cpp
@@ -31,6 +36,7 @@ qt_add_qml_module(appWorkFlowEditor
         SimpleRelation.qml
         InputDataBlock.qml
         OutputBlock.qml
+        SimpleRelationHandle.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

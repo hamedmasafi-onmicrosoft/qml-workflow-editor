@@ -37,10 +37,7 @@ Block {
 
     }
 
-    RelationHandle {
-        width: 30
-        height: 30
-
+    SimpleRelationHandle {
         type: RelationHandle.Output
 
         anchors {
@@ -48,11 +45,6 @@ Block {
             top: parent.top
             topMargin: 50
             rightMargin: -15
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            color: 'red'
         }
     }
 }

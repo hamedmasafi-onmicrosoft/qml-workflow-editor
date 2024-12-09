@@ -2,37 +2,33 @@
 
 #include "relationhandle.h"
 
-#include <QPainter>
-#include <QPainterPath>
+#include <QQuickItem>
 #include <QQuickPaintedItem>
 
 class WorkFlowEditorArea;
-class Relation : public QQuickPaintedItem
+class AbstractRelation : public QQuickPaintedItem
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_UNCREATABLE("Abstract relation class")
 
     Q_PROPERTY(QPointF startPoint READ startPoint WRITE setStartPoint NOTIFY startPointChanged FINAL)
     Q_PROPERTY(QPointF endPoint READ endPoint WRITE setEndPoint NOTIFY endPointChanged FINAL)
 
-    Q_PROPERTY(RelationHandle* startHandle READ startHandle WRITE setStartHandle NOTIFY startHandleChanged FINAL)
-    Q_PROPERTY(RelationHandle* endHandle READ endHandle WRITE setEndHandle NOTIFY endHandleChanged FINAL)
+    Q_PROPERTY(RelationHandle *startHandle READ startHandle WRITE setStartHandle NOTIFY
+                   startHandleChanged FINAL)
+    Q_PROPERTY(
+        RelationHandle *endHandle READ endHandle WRITE setEndHandle NOTIFY endHandleChanged FINAL)
+
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged FINAL)
 
 public:
-    enum class LineType {
-        BLineHori, /* //  */
-        FlineHori  /* \\  */
-    };
-    Q_ENUM(LineType)
-    Relation(QQuickItem *parent = nullptr);
+    AbstractRelation(QQuickItem *parent = nullptr);
 
     QPointF startPoint() const;
     void setStartPoint(const QPointF &point);
 
     QPointF endPoint() const;
     void setEndPoint(const QPointF &point);
-
-    void paint(QPainter *painter) override;
 
     RelationHandle *startHandle() const;
     void setStartHandle(RelationHandle *newStartHandle);
@@ -43,20 +39,25 @@ public:
     WorkFlowEditorArea *area() const;
     void setArea(WorkFlowEditorArea *newArea);
 
+    QColor color() const;
+    void setColor(const QColor &newColor);
+
+protected:
+    virtual void updateGeometry() = 0;
+
 signals:
     void startPointChanged();
     void endPointChanged();
     void startHandleChanged();
     void endHandleChanged();
+    void colorChanged();
 
 private:
-
-    LineType _lineType;
     QPointF m_startPoint;
     QPointF m_endPoint;
 
-    void updateGeometry();
     RelationHandle *m_startHandle = nullptr;
     RelationHandle *m_endHandle = nullptr;
     WorkFlowEditorArea *_area;
+    QColor m_color{Qt::black};
 };

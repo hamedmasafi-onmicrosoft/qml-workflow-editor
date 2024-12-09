@@ -1,7 +1,7 @@
 #include "relationtool.h"
 
 #include "block.h"
-#include "relation.h"
+#include "directrelation.h"
 #include "relationhandle.h"
 #include "workfloweditorarea.h"
 
@@ -21,7 +21,7 @@ void findRelationHandles(QQuickItem* parent, QList<RelationHandle*>& result) {
 RelationTool::RelationTool(WorkFlowEditorArea *parentArea)
     : AbstractTool{parentArea}
 {
-    _preview = new Relation{parentArea};
+    _preview = new DirectRelation{parentArea};
     _preview->setZ(15);
     _preview->setVisible(false);
     _preview->setArea(parentArea);
@@ -38,6 +38,7 @@ RelationTool::ChildMouseEventFilterResult RelationTool::childMouseEventFilter(QQ
 
             if (handle) {
                 // qDebug() << "Fid";
+
                 auto rc = item->mapToItem(parentArea(),
                                           -10,
                                           -10,
@@ -60,8 +61,12 @@ RelationTool::ChildMouseEventFilterResult RelationTool::childMouseEventFilter(QQ
         if (mouseEvent->button() == Qt::LeftButton) {
             auto handles = parentArea()->findChildren<RelationHandle*>();
             auto handle = qobject_cast<RelationHandle *>(item);
-            if (handle)
+            if (handle) {
                 _preview->setStartHandle(handle);
+                _preview->setEndHandle(handle);
+                handle->setState(RelationHandle::HandleState::Connectig);
+            }
+
             // Handle mouse press event for the child
             // qDebug() << "Mouse pressed on child at position:" << mouseEvent->pos()
                      // << handles.size();
@@ -92,12 +97,17 @@ RelationTool::ChildMouseEventFilterResult RelationTool::childMouseEventFilter(QQ
                    && pp.y() + h->height() >= p.y();
         });
 
+        RelationHandle *h;
         if (it == _handles.end())
-            _secondHandle = nullptr;
+            h = nullptr;
         else
-            _secondHandle = *it;
+            h = *it;
 
-        if (_secondHandle) {
+        if (h) {
+            if (_secondHandle && h != _secondHandle)
+                _secondHandle->setState(RelationHandle::HandleState::UnConnected);
+            _secondHandle = h;
+            _secondHandle->setState(RelationHandle::HandleState::Connectig);
             auto handlePos = _secondHandle->mapToItem(parentArea(), {0, 0});
             _highlightItem->setPosition({handlePos.x() - 10, handlePos.y() - 10});
             _highlightItem->setSize({_secondHandle->width() + 20, _secondHandle->height() + 20});
@@ -126,11 +136,11 @@ RelationTool::ChildMouseEventFilterResult RelationTool::childMouseEventFilter(QQ
                 // rel->setZ(15);
                 // rel->setVisible(true);
                 auto rel = parentArea()->addRelation(_firstHandle, _secondHandle);
-                _highlightItem->setVisible(false);
                 // qDebug() << "Relation created" <<rel->position() << rel->size();
             }
             return ChildMouseEventFilterResult::False; // Continue with default processing
         }
+        _highlightItem->setVisible(false);
         _preview->setVisible(false);
         break;
     }

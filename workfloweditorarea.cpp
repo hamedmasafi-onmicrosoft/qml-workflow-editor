@@ -3,7 +3,7 @@
 #include "commands/addblockcommand.h"
 
 #include "block.h"
-#include "relation.h"
+#include "directrelation.h"
 #include "relationtool.h"
 #include "selecttool.h"
 
@@ -26,7 +26,24 @@ QQuickItem *WorkFlowEditorArea::addBlock(QQmlComponent *block, const QVariantMap
     return cmd->_childItem;
 }
 
-Relation *WorkFlowEditorArea::addRelation(Block *from, Block *to)
+QQuickItem *WorkFlowEditorArea::addMiddleBlock(QQmlComponent *block,
+                                               AbstractRelation *relation,
+                                               const QVariantMap &props)
+{
+    auto cmd = new AddBlockCommand{this, block, props};
+    _undoStack.push(cmd);
+    auto newBlock = qobject_cast<Block *>(cmd->_childItem);
+
+    newBlock->setPosition({relation->x() + (relation->width() - newBlock->width()) / 2,
+                           relation->y() + (relation->height() - newBlock->height()) / 2});
+
+    auto to = relation->endHandle();
+    relation->setEndHandle(newBlock->handles(RelationHandle::HandleType::Input).first());
+    addRelation(newBlock->handles(RelationHandle::HandleType::Output).first(), to);
+    return newBlock;
+}
+
+AbstractRelation *WorkFlowEditorArea::addRelation(Block *from, Block *to)
 {
     auto fromList = from->handles(RelationHandle::HandleType::Output);
     auto toList = to->handles(RelationHandle::HandleType::Input);
@@ -37,9 +54,9 @@ Relation *WorkFlowEditorArea::addRelation(Block *from, Block *to)
     return addRelation(fromList.first(), toList.first());
 }
 
-Relation *WorkFlowEditorArea::addRelation(RelationHandle *from, RelationHandle *to)
+AbstractRelation *WorkFlowEditorArea::addRelation(RelationHandle *from, RelationHandle *to)
 {
-    Relation *rel{};
+    AbstractRelation *rel{};
     if (m_relationComponent) {
         auto context = QQmlEngine::contextForObject(m_relationComponent); // Get a valid context
         if (!context) {
@@ -48,51 +65,24 @@ Relation *WorkFlowEditorArea::addRelation(RelationHandle *from, RelationHandle *
         }
 
         auto obj = m_relationComponent->create(context);
-        rel = qobject_cast<Relation *>(obj);
+        rel = qobject_cast<AbstractRelation *>(obj);
     }
     if (!rel)
-        rel = new Relation{this};
+        rel = new DirectRelation{this};
     rel->setArea(this);
     rel->setParentItem(this);
     rel->setStartHandle(from);
     rel->setEndHandle(to);
     rel->setZ(15);
     rel->setVisible(true);
+
+    from->setState(RelationHandle::HandleState::Connected);
+    to->setState(RelationHandle::HandleState::Connected);
     return rel;
 }
 
 bool WorkFlowEditorArea::childMouseEventFilter(QQuickItem *child, QEvent *event)
 {
-    // switch (event->type()) {
-    // case QEvent::MouseButtonPress: {
-    //     qDebug() << "press";
-    //     QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-    //     if (mouseEvent->button() == Qt::LeftButton) {
-    //         // Handle mouse press event for the child
-    //         qDebug() << "Mouse pressed on child at position:" << mouseEvent->pos();
-    //         return false; // Continue with default processing
-    //     }
-    //     break;
-    // }
-    // case QEvent::MouseMove: {
-    //     QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-    //     // Handle mouse move event for the child
-    //     qDebug() << "Mouse moved on child to position:" << mouseEvent->pos();
-    //     return false; // Continue with default processing
-    // }
-    // case QEvent::MouseButtonRelease: {
-    //     QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-    //     if (mouseEvent->button() == Qt::LeftButton) {
-    //         // Handle mouse release event for the child
-    //         qDebug() << "Mouse released on child at position:" << mouseEvent->pos();
-    //         return false; // Continue with default processing
-    //     }
-    //     break;
-    // }
-    // default:
-    //     break;
-    // }
-
     if (_activeTool)
         switch (_activeTool->childMouseEventFilter(child, event)) {
         case AbstractTool::ChildMouseEventFilterResult::True:

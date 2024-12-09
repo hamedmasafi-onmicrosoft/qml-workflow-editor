@@ -15,21 +15,12 @@ Block {
     }
 
 
-
-    RelationHandle {
-        width: 30
-        height: 30
-
+    SimpleRelationHandle {
         type: RelationHandle.Input
         anchors {
             left: parent.left
             verticalCenter: parent.verticalCenter
             leftMargin: -15
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            color: 'red'
         }
     }
 }

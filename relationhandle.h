@@ -18,7 +18,7 @@ public:
     enum class HandleState {
         UnConnected,
         Connectig,
-        Connecting
+        Connected
     };
     Q_ENUM(HandleState)
 

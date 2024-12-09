@@ -57,7 +57,12 @@ ApplicationWindow {
         id: area
         anchors.fill: parent
 
-        relationComponent: SimpleRelation {}
+        relationComponent: SimpleRelation {
+            onAddClicked: {
+                console.log("Add clicked")
+                area.addMiddleBlock(blockComponent, this, {width: 200, height: 200});
+            }
+        }
         highlightComponent: Rectangle {
             color: 'yellow'
             border.color: 'blue'

@@ -3,7 +3,7 @@
 #include "abstracttool.h"
 
 class RelationHandle;
-class Relation;
+class AbstractRelation;
 class RelationTool : public AbstractTool
 {
     Q_OBJECT
@@ -22,7 +22,7 @@ private:
     RelationHandle *_firstHandle{nullptr};
     RelationHandle *_secondHandle{nullptr};
     QQuickItem *_highlightItem{nullptr};
-    Relation *_preview;
+    AbstractRelation *_preview;
     QList<RelationHandle *> _handles;
 
     // AbstractTool interface
