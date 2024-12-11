@@ -4,26 +4,23 @@ import QtQuick.Controls
 import WorkFlowEditor
 
 Block {
-    Rectangle {
+    id: block
+    title: "Simple"
+
+    padding: 20
+    // height: implicitHeight
+
+    header :BlockHeader {
+        title: "Simple" + block.height
+    }
+
+    background: Rectangle {
         anchors.fill: parent
         border.color: 'gray'
         radius: 15
     }
 
-    Label {
-        text: 'sample text'
-        anchors.centerIn: parent
-    }
-
-    ColumnLayout {
-        anchors{
-
-            top: parent.top
-            left: parent.left
-            right: parent.right
-            margins: 20
-        }
-
+    contentItem: ColumnLayout {
         Label {
             text: qsTr("Provider")
         }
@@ -38,8 +35,9 @@ Block {
 
         anchors {
             right: parent.right
-            verticalCenter: parent.verticalCenter
             rightMargin: -15
+            top: parent.top
+            topMargin: 25
         }
     }
 
@@ -47,8 +45,9 @@ Block {
         type: RelationHandle.Input
         anchors {
             left: parent.left
-            verticalCenter: parent.verticalCenter
             leftMargin: -15
+            top: parent.top
+            topMargin: 25
         }
     }
 }

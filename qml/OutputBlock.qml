@@ -3,15 +3,15 @@ import QtQuick.Controls
 import WorkFlowEditor
 
 Block {
-    Rectangle {
-        anchors.fill: parent
+    background: Rectangle {
         border.color: 'gray'
         radius: 15
     }
 
-    Label {
+    contentItem:    Label {
         text: 'Output'
-        anchors.centerIn: parent
+        verticalAlignment: Label.AlignVCenter
+        horizontalAlignment: Label.AlignHCenter
     }
 
 
@@ -19,8 +19,9 @@ Block {
         type: RelationHandle.Input
         anchors {
             left: parent.left
-            verticalCenter: parent.verticalCenter
             leftMargin: -15
+            top: parent.top
+            topMargin: 25
         }
     }
 }

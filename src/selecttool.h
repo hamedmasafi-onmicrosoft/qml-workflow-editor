@@ -8,7 +8,7 @@ class Block;
 class SelectTool : public AbstractTool
 {
     Q_OBJECT
-    QML_ELEMENT
+    // QML_ELEMENT
 
 public:
     SelectTool(WorkFlowEditorArea *parentArea);

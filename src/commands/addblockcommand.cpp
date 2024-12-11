@@ -35,6 +35,8 @@ void AddBlockCommand::redo()
     }
 
     auto context = QQmlEngine::contextForObject(_childComponent); // Get a valid context
+    if (!context)
+        context = _childComponent->creationContext();
     if (!context) {
         qDebug() << "Failed to get a valid QQmlContext!";
         return;

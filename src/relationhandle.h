@@ -45,5 +45,5 @@ protected:
 private:
     HandleType m_type;
     Block *_parentBlock;
-    HandleState m_state;
+    HandleState m_state{HandleState::UnConnected};
 };

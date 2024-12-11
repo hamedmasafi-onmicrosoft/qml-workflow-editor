@@ -9,10 +9,11 @@
 
 #include <QDebug>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QQmlEngine>
 
 WorkFlowEditorArea::WorkFlowEditorArea(QQuickItem *parent)
-    : QQuickItem{parent}
+    : QQuickPaintedItem{parent}
 {
     setFiltersChildMouseEvents(true);
     setAcceptHoverEvents(true);
@@ -119,14 +120,15 @@ void WorkFlowEditorArea::createTools()
 
     auto selectTool = new SelectTool{this};
 
-    _tools.insert(Tool::Select,selectTool);
+    _tools.insert(Tool::Select, selectTool);
     _tools.insert(Tool::Relation, relTool);
 
     setSelectedTool(Tool::Select);
 }
 
-void WorkFlowEditorArea::tool_activated() {
-    auto tool = qobject_cast<AbstractTool*>(sender());
+void WorkFlowEditorArea::tool_activated()
+{
+    auto tool = qobject_cast<AbstractTool *>(sender());
 
     if (!tool)
         return;
@@ -141,6 +143,32 @@ void WorkFlowEditorArea::componentComplete()
 {
     createTools();
     QQuickItem::componentComplete();
+}
+
+void WorkFlowEditorArea::paint(QPainter *painter)
+{
+    painter->fillRect(boundingRect(), m_backgroundColor);
+
+    painter->setPen(m_gridColor);
+
+    switch (m_gridType) {
+    case WorkFlowEditorArea::GridType::None:
+        break;
+    case WorkFlowEditorArea::GridType::Dot:
+        for (int x = m_gridSize; x < width(); x += m_gridSize)
+            for (int y = m_gridSize; y < height(); y += m_gridSize)
+                painter->drawPoint(x, y);
+        break;
+    case WorkFlowEditorArea::GridType::Grid:
+        for (qreal x = 0; x < width(); x += m_gridSize) {
+            painter->drawLine(QPointF(x, 0), QPointF(x, height()));
+        }
+
+        for (qreal y = 0; y < height(); y += m_gridSize) {
+            painter->drawLine(QPointF(0, y), QPointF(width(), y));
+        }
+        break;
+    }
 }
 
 QQmlComponent *WorkFlowEditorArea::highlightComponent() const
@@ -185,4 +213,60 @@ void WorkFlowEditorArea::setRelationComponent(QQmlComponent *newRelationComponen
         return;
     m_relationComponent = newRelationComponent;
     emit relationComponentChanged();
+}
+
+int WorkFlowEditorArea::gridSize() const
+{
+    return m_gridSize;
+}
+
+void WorkFlowEditorArea::setGridSize(int newGridSize)
+{
+    if (m_gridSize == newGridSize)
+        return;
+    m_gridSize = newGridSize;
+    Q_EMIT gridSizeChanged();
+    update();
+}
+
+WorkFlowEditorArea::GridType WorkFlowEditorArea::gridType() const
+{
+    return m_gridType;
+}
+
+void WorkFlowEditorArea::setGridType(GridType newGridType)
+{
+    if (m_gridType == newGridType)
+        return;
+    m_gridType = newGridType;
+    Q_EMIT gridTypeChanged();
+    update();
+}
+
+QColor WorkFlowEditorArea::gridColor() const
+{
+    return m_gridColor;
+}
+
+void WorkFlowEditorArea::setGridColor(const QColor &newGridColor)
+{
+    if (m_gridColor == newGridColor)
+        return;
+    m_gridColor = newGridColor;
+    Q_EMIT gridColorChanged();
+    update();
+}
+
+QColor WorkFlowEditorArea::backgroundColor() const
+{
+    return m_backgroundColor;
+}
+
+void WorkFlowEditorArea::setBackgroundColor(const QColor &newBackgroundColor)
+{
+    if (m_backgroundColor == newBackgroundColor)
+        return;
+    m_backgroundColor = newBackgroundColor;
+    Q_EMIT backgroundColorChanged();
+    update();
 }

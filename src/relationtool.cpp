@@ -92,9 +92,9 @@ RelationTool::ChildMouseEventFilterResult RelationTool::childMouseEventFilter(QQ
 
         auto p = item->mapToItem(parentArea(), mouseEvent->position());
         auto it = std::find_if(_handles.begin(), _handles.end(), [this, &p](RelationHandle *h) {
-            auto pp = h->mapToItem(parentArea(), {0, 0});
-            return pp.x() <= p.x() && pp.y() <= p.y() && pp.x() + h->width() >= pp.x()
-                   && pp.y() + h->height() >= p.y();
+            auto handleRelPos = h->mapToItem(parentArea(), {0, 0});
+            return handleRelPos.x() <= p.x() && handleRelPos.y() <= p.y() && handleRelPos.x() + h->width() >= p.x()
+                   && handleRelPos.y() + h->height() >= p.y();
         });
 
         RelationHandle *h;

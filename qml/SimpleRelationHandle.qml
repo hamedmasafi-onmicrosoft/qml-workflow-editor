@@ -5,11 +5,6 @@ RelationHandle {
     width: 30
     height: 30
 
-    // Rectangle {
-    //     anchors.fill: parent
-    //     color: 'red'
-    // }
-
     Rectangle {
         width: 2
         height: 10
@@ -17,5 +12,16 @@ RelationHandle {
         color: 'gray'
         anchors.centerIn: parent
         visible: parent.state == RelationHandle.Connected
+    }
+
+
+    Rectangle {
+        width: 2
+        height: 10
+
+        color: 'white'
+        border.color: 'gray'
+        anchors.centerIn: parent
+        visible: parent.state == RelationHandle.UnConnected
     }
 }
